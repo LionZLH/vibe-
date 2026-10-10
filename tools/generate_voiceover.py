@@ -33,15 +33,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 VOICE_DIR = BASE_DIR / "配音"
 ZHENGPIAN_DIR = VOICE_DIR / "正片"
 AUDIO_SEGMENTS_DIR = BASE_DIR / "audio_segments"
-RAW_WAV_DIR = VOICE_DIR / "raw_wav"
+TTS_URL = "http://127.0.0.1:3900/v1/audio/speech"
+VOICE_ID = "86779cdf"  # zhao
+RAW_WAV_DIR = VOICE_DIR / f"raw_wav_{VOICE_ID}"
 TIMING_JSON = VOICE_DIR / "timing.json"
 
 for d in [VOICE_DIR, ZHENGPIAN_DIR, AUDIO_SEGMENTS_DIR, RAW_WAV_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
-TTS_URL = "http://127.0.0.1:3900/v1/audio/speech"
-VOICE_ID = "30118d68"
-SPEED = 1.2
+SPEED = 1.0  # 底模设为 1.0，由 ffmpeg atempo 物理精准加速
 NUM_STEP = 32
 GUIDANCE_SCALE = 2.5
 TAIL_PAD_MS = 200
@@ -221,7 +221,7 @@ def main():
     print("=" * 65)
     print("🎙️ 014期《AI 七十年》口播音频逐句生成与广播级母带工程 (1.2倍速版)")
     print(f"📊 待合成总句数: {len(SCRIPT_ITEMS)} 句")
-    print(f"🎚️ 音色: {VOICE_ID} (001) | 语速: {SPEED} (1.2x) | 预设: 32步底模 / 2.5共鸣")
+    print(f"🎚️ 音色: {VOICE_ID} (zhao) | 语速: 1.2x | 预设: 32步底模 / 2.5共鸣")
     print(f"🔊 母带链: 145Hz(+3.2dB) + 3800Hz(+1.2dB) + loudnorm(-14 LUFS) + 320k MP3")
     print("=" * 65)
 
