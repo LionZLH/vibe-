@@ -4,7 +4,7 @@ import { THREE, CAM, G, canvasTex } from '../gl.js';
 import { F } from '../film.js';
 import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot } from '../core.js';
 import { X, LANE, spineState } from '../spine.js';
-import { stage, photo, textMesh, typeset, doc, motes, pose, mixP, LOOK } from '../kit.js';
+import { stage, photo, textMesh, typeset, doc, motes, pose, mixP, LOOK, only } from '../kit.js';
 import { chapterAt } from '../chapter.js';
 
 /* ======================= 二 · 命名 ======================= */
@@ -34,7 +34,7 @@ import { chapterAt } from '../chapter.js';
   const y56 = textMesh('1956', 7, { color: '#f2b33d', font: '900 200px SourceHanSerif' }); y56.position.set(100, 1.5, 0); grp.add(y56);
   const place = textMesh('DARTMOUTH COLLEGE · HANOVER, NEW HAMPSHIRE', .7, { font: '700 200px JBM', color: '#cfc6b8', ls: 8 }); place.position.set(100, -3.6, 0); grp.add(place);
   /* 规则轨标注 */
-  const ruleLab = textMesh('规则', 2.2, { color: '#dfe6ee', font: '900 200px SourceHanSerif' }); ruleLab.position.set(X(1956) + 4, LANE.rule + 2.4, 0); ruleLab.visible = false; S.grp.parent.add(ruleLab);
+  const ruleLab = textMesh('规则', 2.2, { color: '#dfe6ee', font: '900 200px SourceHanSerif' }); ruleLab.position.set(X(1956) + 4, LANE.rule + 2.4, 0); ruleLab.visible = false; S.grp.parent.add(ruleLab); only(ruleLab, T0, T1);
   const tB2 = cw('b2', '人工智能'), tB3m = cw('b3', '一群科学家'), tB3s = cw('b3', '一个夏天'), tB4 = c('b4'), tB5 = c('b5');
   shot({ name: 'ch2', t0: T0, t1: T1, look(t) {
     LOOK.silver(G, F);
@@ -131,7 +131,7 @@ import { chapterAt } from '../chapter.js';
   document.getElementById('dom').appendChild(mkData);
   /* 两条轨的标注 */
   const ruleLab = textMesh('规则', 2.2, { color: '#dfe6ee', font: '900 200px SourceHanSerif' }), learnLab = textMesh('学习', 2.2, { color: '#f2b33d', font: '900 200px SourceHanSerif' });
-  ruleLab.position.set(X(1959), LANE.rule + 2.4, 0); learnLab.position.set(X(1961), LANE.learn - 2.6, 0); S.grp.parent.add(ruleLab, learnLab);
+  ruleLab.position.set(X(1959), LANE.rule + 2.4, 0); learnLab.position.set(X(1961), LANE.learn - 2.6, 0); S.grp.parent.add(ruleLab, learnLab); only(ruleLab, T0, T1); only(learnLab, T0, T1);   // 只在本章出现，之后飞过 1958 时不残留
   const tD2 = c('d2'), tD3 = c('d3'), tD4 = c('d4'), tD5 = c('d5'), tD6 = c('d6'), tD7 = c('d7');
   const tSim0 = tD3 - .3, tSim1 = tD5 - .5;
   tl.set(ctr, { opacity: 1 }, tSim0 + .3).set([ctr, dots], { opacity: 0 }, tSim1).set(dots, { opacity: 1 }, tSim0 + .3);

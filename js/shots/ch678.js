@@ -339,9 +339,18 @@ const digitMesh = (d, col, s = 1) => {
   const die = plane(await loadTex('素材/图/gpu_die.jpg'), 20, 20 * 1365 / 2048, { depthWrite: true }); die.position.set(180, 0, 0); grp.add(die);
   const sweepTex = canvasTex(512, 16, (g, w, h) => { const r = g.createLinearGradient(0, 0, w, 0); r.addColorStop(0, 'rgba(255,200,120,0)'); r.addColorStop(.5, 'rgba(255,230,190,1)'); r.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = r; g.fillRect(0, 0, w, h); });
   const sweep = plane(sweepTex, 6, 18, { additive: true, bright: .5 }); sweep.position.set(180, 0, .05); sweep.rotation.z = .5; grp.add(sweep);
-  const CN = 32 * 16, cores = new THREE.InstancedMesh(new THREE.PlaneGeometry(.3, .3), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .7, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), CN);
-  { const o = new THREE.Object3D(); for (let i = 0; i < CN; i++) { o.position.set(((i % 32) - 15.5) * .42, (Math.floor(i / 32) - 7.5) * .42, .08); o.updateMatrix(); cores.setMatrixAt(i, o.matrix); cores.setColorAt(i, new THREE.Color(0, 0, 0)); } }
-  cores.position.set(180, 0, 0); grp.add(cores);
+  /* 并行：不另外盖格子，让芯片自己的电路结构亮起来——按 32×16 个区块同时脉动（亮度乘芯片照片本身的明暗，黑底不亮） */
+  const dieTex = die.userData.u.uMap.value, DU = { uMap: { value: dieTex }, uK: { value: 0 }, uTime: { value: 0 } };
+  const cores = new THREE.Mesh(new THREE.PlaneGeometry(20, 20 * 1365 / 2048), new THREE.ShaderMaterial({ uniforms: DU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, vertexShader: VS,
+    fragmentShader: `uniform sampler2D uMap; uniform float uK, uTime; varying vec2 vUv;
+      float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      void main(){ vec3 c = texture2D(uMap, vUv).rgb; float l = dot(c, vec3(.2126, .7152, .0722));
+        vec2 cell = floor(vUv * vec2(32., 16.)); float ph = h(cell) * 6.2832;
+        float beat = pow(.5 + .5 * sin(uTime * 9. + ph * .15), 3.);
+        float edge = 1. - smoothstep(.35, .5, max(abs(fract(vUv.x * 32.) - .5), abs(fract(vUv.y * 16.) - .5)) );
+        float v = uK * (.25 + .75 * beat) * smoothstep(.08, .5, l) * (.55 + .45 * edge);
+        gl_FragColor = vec4(vec3(1.5, .95, .32) * v * (.4 + l) * .42, 1.); }` }));
+  cores.position.set(180, 0, .03); grp.add(cores);
   const gpuCard = infoCard({ title: 'GTX 580 · 2010', rows: [['512', '个核心', '同时算'], ['×', '乘法 · 加法', '每个都在干']], src: '芯片照片：Fritzchens Fritz · CC0' });
   gpuCard.show(tG4 - .2, tG5 - .4, [cw('g4', '海量并行') - .3, cw('g4', '乘法') - .2]);
   /* AlexNet 原始源码（逐字读自计算机历史博物馆开源的代码） */
@@ -413,7 +422,7 @@ const digitMesh = (d, col, s = 1) => {
         const k = E.io2(seg(t, tG4 - .3, tG5 - .3));
         sweep.position.x = 180 + lerp(-14, 14, seg(t, tG4 - .3, tG4 + 1.6)); sweep.userData.u.uOp.value = 1 - seg(t, tG4 + 1.2, tG4 + 1.6);
         const tPar = cw('g4', '海量并行') - .2, kp = seg(t, tPar, tPar + .2);
-        for (let i = 0; i < CN; i++) { const v = kp * (.35 + .65 * (Math.sin(t * 14 - (i % 32) * .35 - Math.floor(i / 32) * .6) * .5 + .5)); cores.setColorAt(i, new THREE.Color(.9 * v, .55 * v, .16 * v)); } cores.instanceColor.needsUpdate = true;
+        DU.uK.value = kp; DU.uTime.value = t;
         cam = P([180 - lerp(4.4, 3.4, k), lerp(-.6, 0, k), lerp(17, 13, k)], [180 - lerp(3.6, 3, k), 0, 0], 35, lerp(.04, 0, k));
         G.flash = .45 * (1 - E.o3(seg(t, tG4 - .3, tG4))); G.bloom = .7;
       } else if (codeP.visible) {

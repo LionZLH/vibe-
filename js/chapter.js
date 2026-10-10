@@ -53,8 +53,9 @@ CH.forEach((ch, i) => {
     CH.forEach(o => o.card.visible = o === ch);
     const x = xs(t), v = (xs(t + .02) - xs(t - .02)) / .04;
     const fly = { x: x - 9, y: 5.4, z: 14, tx: x + 46, ty: -.6, tz: -1.5, fov: 38 + clamp(Math.abs(v) / 400) * 10, roll: .02 * Math.sign(v) * clamp(Math.abs(v) / 300) };
-    const side = { x: X(ch.to) + 1.5, y: 4.5, z: 30, tx: X(ch.to) + 1.5, ty: 4.2, tz: 0, fov: 35, roll: 0 };
-    const kS = E.io3(seg(t, ch.t1 - 1.5, ch.t1 - .5));
+    /* 落定构图：时间轴在画面下方，章名牌在中上；镜头转正之后牌子才升起，不会被画面顶边切掉、也不压左上角的年份 */
+    const side = { x: X(ch.to) + 1.5, y: 6.5, z: 34, tx: X(ch.to) + 1.5, ty: 7.2, tz: 0, fov: 35, roll: 0 };
+    const kS = E.io3(seg(t, ch.t1 - 1.9, ch.t1 - .75));
     const cam = mixP(fly, side, kS);
     cam.x += .3 * Math.sin(t * .9); cam.y += .2 * Math.sin(t * 1.3);
     /* 离场：甩向右 */
@@ -68,7 +69,7 @@ CH.forEach((ch, i) => {
     G.tint = [G.tint[0] - .1 * wk, G.tint[1], G.tint[2] + .08 * wk];
     spineState({ on: true, axis: 1, labels: 1, lanes: 1, ice: [ch.to > 1975 || ch.from > 1975 ? 1 : 0, ch.to > 1988 || ch.from > 1988 ? 1 : 0], iceDir: 1, cut: X(1969) < x + 30 && ch.to >= 1969 ? 1 : 0, cutLabel: 0, ember: ch.to >= 1969 && ch.to < 1986 ? 1 : ch.to >= 1986 ? 1 : 0, head: 0, origin: 1 });
     /* 章名牌：年份先升起，章名跟上 */
-    const ky = E.o3(seg(t, ch.t1 - 1.5, ch.t1 - .9)), kn = E.o3(seg(t, ch.t1 - 1.25, ch.t1 - .7));
+    const ky = E.o3(seg(t, ch.t1 - 1.2, ch.t1 - .62)), kn = E.o3(seg(t, ch.t1 - 1.0, ch.t1 - .45));
     ch.cy.userData.u.uOp.value = ky; ch.cy.position.y = 2.2 - (1 - ky) * 1.2;
     ch.cn.userData.u.uOp.value = kn; ch.cn.position.y = -1.6 - (1 - kn) * .8;
   } });

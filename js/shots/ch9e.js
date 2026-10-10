@@ -5,7 +5,7 @@
    尾声（e1–e8）：IMO 35/42 → 代理：写代码、查资料、操作电脑 → 沿轴倒飞回 1950，胶片一层层变回银盐 → 论文最后一句 → 全轴 */
 import { THREE, scene, CAM, G, canvasTex, loadTex, plane } from '../gl.js';
 import { F } from '../film.js';
-import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot, DUR, track } from '../core.js';
+import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot, DUR, track, onFrame } from '../core.js';
 import { X, LANE, spineState, glow } from '../spine.js';
 import { stage, photo, textMesh, typeset, doc, motes, pose, mixP, LOOK, wipeText, ringTex, sprite, infoCard, label, only, shade } from '../kit.js';
 import { chapterAt } from '../chapter.js';
@@ -250,7 +250,7 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
   const T0 = chapterAt('s1').t1, T1 = chapterAt('n1').t0;
   const onSp = new THREE.Group(); scene.add(onSp); only(grp, T0, T1); only(onSp, T0, T1);
   const tS2 = c('s2'), tS3 = c('s3'), tS4 = c('s4'), tS5 = c('s5'), tS6 = c('s6'), tS7 = c('s7');
-  const bet = textMesh('押注：把模型做大', 2.2, { font: '900 200px SourceHanSerif', color: '#f2b33d' }); bet.position.set(X(2018) + 4, LANE.learn - 4.6, 1); onSp.add(bet);
+  const bet = textMesh('押注：把模型做大', 2.2, { font: '900 200px SourceHanSerif', color: '#f2b33d' }); bet.position.set(X(2018) + 4, LANE.learn - 9.5, 1); onSp.add(bet);
   /* 参数量：一个光点 = 100 万个参数 */
   const cube = (n, gap, cx) => { const s = Math.ceil(Math.cbrt(n)), p = new Float32Array(n * 3), side = (s - 1) * gap; for (let i = 0; i < n; i++) { const a = i % s, b = Math.floor(i / s) % s, d = Math.floor(i / (s * s)); p.set([cx + a * gap - side / 2 + (hash(i * 1.7) - .5) * gap * .3, d * gap + (hash(i * 2.9) - .5) * gap * .3, b * gap - side / 2 + (hash(i * 3.3) - .5) * gap * .3], i * 3); } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3)); return { g, side }; };
   const GPT = [[117, 0, 'GPT-1 · 2018', '1.17 亿'], [1500, 4.2, 'GPT-2 · 2019', '15 亿'], [175000, 20, 'GPT-3 · 2020', '1750 亿']].map(([n, cx, nm, v], i) => { const { g, side } = cube(n, .2, cx); const pts = new THREE.Points(g, pointsMat(i === 2 ? [1.1, .66, .2] : [1.4, 1.3, 1.15], i === 2 ? .055 : .09)); pts.userData.op = i === 2 ? .32 : 1; pts.frustumCulled = false; grp.add(pts);
@@ -357,7 +357,6 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
   const arc = line2(cp.map(v => v.toArray()), 0xffffff, 5); arc.material.color.setRGB(2.6, 1.6, .5); onSp.add(arc);
   const headG = glow(0, 0, 0, 4, onSp);
   const y55 = textMesh('55 年', 13, { font: '900 200px SourceHanSerif', color: '#f2b33d', hdr: 1.1 }); y55.position.set(X(1996.5), 40, 4); onSp.add(y55);
-  const y24 = textMesh('2024', 4.4, { font: '900 200px SourceHanSerif', color: '#f2b33d' }); y24.position.set(X(2024), LANE.learn - 4.6, 0); onSp.add(y24);
   const tArc0 = cw('n3', '55 年后') - .8, tArc1 = cw('n3', '诺贝尔') + .3;
   shot({ name: 'ch12', t0: T0, t1: T1, look(t) {
     LOOK.digital(G, F);
@@ -375,7 +374,7 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
     } else {
       spineState({ on: true, axis: 1, labels: 1, lanes: 1, ice: [1, 1], iceDir: 1, cut: 1, cutLabel: 1, ember: 1, head: 1, origin: 1 });
       const ka = E.io2(seg(t, tArc0, tArc1)); drawTo(arc, ka); const hp = curve.getPoint(Math.max(.001, ka)); headG.position.copy(hp); headG.visible = ka > 0 && ka < 1; headG.scale.setScalar(4 + Math.sin(t * 20) * .4);
-      y55.userData.u.uOp.value = E.o3(seg(t, cw('n3', '55 年后') - .2, cw('n3', '55 年后') + .4)); y24.userData.u.uOp.value = E.o3(seg(t, tArc1 - .4, tArc1 + .2));
+      y55.userData.u.uOp.value = E.o3(seg(t, cw('n3', '55 年后') - .2, cw('n3', '55 年后') + .4));
       const start = { x: X(1969) + 8, y: -1, z: 24, tx: X(1969) + 1, ty: LANE.learn - 1, tz: 0, fov: 35, roll: 0 };
       const ride = { x: hp.x - 30, y: hp.y + 8, z: 70, tx: hp.x + 10, ty: hp.y * .7, tz: 0, fov: 38, roll: 0 };
       const end = { x: X(1996.5), y: 26, z: 330, tx: X(1996.5), ty: 18, tz: 0, fov: 35, roll: 0 };
@@ -428,13 +427,28 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
   /* 倒飞：2025 → 1950 */
   const tBack0 = tE4 - .3, tBack1 = cw('e4', '图灵发问') + .1;
   const backX = track([[tBack0, X(2025)], [tBack1, X(1950)]]);
-  /* 片尾字：七十年整条轴斜着退向远处，片名压在上方 */
-  const fin = hidden(el(null, 'position:absolute;left:0;top:200px;width:1920px;display:flex;flex-direction:column;align-items:center'));
+  /* 片尾（升华）：纸面化成一束光落回 1950 → 光沿七十年一路跑到 2026，胶片随年代变 → 轴没有终点，化成一串光点伸向星海
+     → 片名下打出 1950 — 2026，再把 2026 删掉，只留光标：故事还没写完 */
+  const tF0 = tE8 - .3, tRun0 = tE8 + .35, tRun1 = tE8 + 3.6, tFut = tE8 + 3.6, tTitle = tE8 + 5.0;
+  const runX = track([[tRun0, X(1950)], [tRun1, X(2026)], [DUR, X(2026) + 260]]);
+  const runner = glow(0, 0, 0, 4, onSp), trail = [...Array(14)].map((_, i) => glow(0, 0, 0, 3 * (1 - i / 16), onSp));
+  const NF = 160, futP = new Float32Array(NF * 3); for (let i = 0; i < NF; i++) futP.set([X(2026) + 2.5 + i * 2.5 * (1 + i * .012), 0, 0], i * 3);
+  const futG = new THREE.BufferGeometry(); futG.setAttribute('position', new THREE.BufferAttribute(futP, 3));
+  const futU = { uK: { value: 0 } };
+  const future = new THREE.Points(futG, new THREE.ShaderMaterial({ uniforms: futU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+    vertexShader: `uniform float uK; varying float vA; void main(){ float i = float(gl_VertexID); vA = clamp(uK * 160. - i, 0., 1.) * (1. - i / 170.); vec4 mv = modelViewMatrix * vec4(position, 1.); gl_Position = projectionMatrix * mv; gl_PointSize = 26. * (20. / -mv.z); }`,
+    fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord - .5); if (d > .5) discard; gl_FragColor = vec4(vec3(2.4, 1.5, .5) * smoothstep(.5, 0., d) * vA, 1.); }` }));
+  future.frustumCulled = false; onSp.add(future);
+  const NSt = 9000, stP = new Float32Array(NSt * 3); for (let i = 0; i < NSt; i++) stP.set([X(2040) + hash(i * 1.1) * 900, (hash(i * 2.3) - .5) * 260, (hash(i * 3.7) - .5) * 320], i * 3);
+  const stG = new THREE.BufferGeometry(); stG.setAttribute('position', new THREE.BufferAttribute(stP, 3));
+  const sky = new THREE.Points(stG, pointsMat([1.2, 1.15, 1.05], .9, 0)); sky.frustumCulled = false; onSp.add(sky);
+  const fin = hidden(el(null, 'position:absolute;left:0;top:190px;width:1920px;display:flex;flex-direction:column;align-items:center'));
   const finT = el(fin, `position:relative;font:900 150px/1 SourceHanSerif;color:#f6efe2;letter-spacing:10px`, '', { 'data-chk': 'text' });
-  const finS = el(fin, `position:relative;margin-top:30px;font:700 40px/1 JBM;color:${COL.amber};letter-spacing:14px;height:40px`, '', { 'data-chk': 'text' });
-  const finE = el(fin, `position:relative;margin-top:36px;font:700 36px/1 PuHuiTi;color:#cfc6b8;letter-spacing:4px`, 'Evan 的 AI 实验室', { 'data-chk': 'text' }); hidden(finE);
-  tl.set(fin, { opacity: 1 }, tE8 - .3); letters(finT, 'AI 七十年', tE8 + .7, .07, .8); typeOn(finS, '1950 — 2026', tE8 + 1.4, 18, false);
-  tl.fromTo(finE, { opacity: 0 }, { opacity: 1, duration: .6, immediateRender: false }, cw('e8', '未来') - .3).to(fin, { opacity: 0, duration: 1.4 }, DUR - 1.6);
+  const finS = el(fin, `position:relative;margin-top:34px;font:700 44px/1 JBM;color:${COL.amber};letter-spacing:14px;height:44px;white-space:pre`, '', { 'data-chk': 'text' });
+  tl.set(fin, { opacity: 1 }, tTitle - .1); letters(finT, 'AI 七十年', tTitle, .08, .9);
+  { const full = '1950 — 2026', tT = tTitle + .9, tDel = tTitle + 3.1;   // 先打出 2026，再一个字一个字删掉，光标一直闪
+    onFrame(t => { if (t < tT) { finS.textContent = ''; return; } const k = Math.floor(clamp((t - tT) * 16, 0, full.length)), del = Math.floor(clamp((t - tDel) * 7, 0, 4)); finS.textContent = full.slice(0, k - del) + (t < tDel + .6 || Math.floor(t * 1.7) % 2 === 0 ? '▍' : ' '); }); }
+  tl.to(fin, { opacity: 0, duration: 1.4 }, DUR - 1.6);
 
   shot({ name: 'epilogue', t0: T0, t1: T1, look(t) {
     let cam;
@@ -473,13 +487,23 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
       lDoc.userData.hi('l', E.io2(seg(t, ce('e7') + .1, ce('e7') + 1.2)));
       const ym = (last.marks.l[0].y + last.marks.l[last.marks.l.length - 1].y) / 2, tgt = lDoc.localToWorld(new THREE.Vector3(.2, (550 - ym + 30) * lpx, 0)), dz = lerp(10.5, 9.2, E.io2(seg(t, tE6, tE8)));
       cam = pose({ x: tgt.x + .3, y: tgt.y - 1.5, z: tgt.z + dz }, tgt, 35, .01);
-      G.flash = flashIn(t, tE6 - .3); G.focus = dz; G.aperture = .0012; G.maxblur = .008;
-    } else {   // 全轴：七十年
-      LOOK.digital(G, F); G.streak = .5;
-      spineState({ on: true, axis: 1, labels: 1, lanes: 1, ice: [1, 1], iceDir: 1, cut: 1, cutLabel: 1, ember: 1, head: 1, origin: 1 });
-      const k = E.io3(seg(t, tE8 - .3, DUR));
-      cam = { x: X(lerp(2031, 2034, k)), y: lerp(10, 26, k), z: lerp(34, 58, k), tx: X(lerp(2012, 1996, k)), ty: lerp(3, 5, k), tz: lerp(-2, -6, k), fov: 38, roll: lerp(.02, .05, k) };
-      G.flash = flashIn(t, tE8 - .3, .55); G.fade = E.io2(seg(t, DUR - 1.6, DUR - .1));
+      G.flash = flashIn(t, tE6 - .3) + .9 * E.i3(seg(t, tE8 - 1, tE8 - .25)); G.focus = dz; G.aperture = .0012; G.maxblur = .008;
+    } else {   // 升华：光沿七十年跑到今天，再伸向前方
+      const rx = runX(t), yr = 1950 + Math.min(rx, X(2026)) / 10, inRun = t < tFut;
+      (yr > 1995 ? LOOK.digital : yr > 1975 ? LOOK.crt : LOOK.silver)(G, F);
+      const old = clamp((2000 - yr) / 45); G.sat = 1 - .5 * old; F.grain = .1 + .4 * old; F.flicker = .25 * old; F.scratch = .25 * old; G.streak = .55; G.bloom = .75;
+      spineState({ on: true, axis: 1, labels: 1, lanes: 1, ice: [1, 1], iceDir: 1, cut: 1, cutLabel: 0, ember: 1, head: 0, origin: 1 });
+      runner.visible = t >= tRun0; runner.position.set(rx, 0, .2); runner.scale.setScalar(inRun ? 4.2 + .4 * Math.sin(t * 22) : lerp(4.2, 1.2, E.o3(seg(t, tFut, tFut + 3))));
+      trail.forEach((g, i) => { const tx = runX(t - (i + 1) * .035); g.visible = runner.visible && tx > X(1950); g.position.set(tx, 0, .2); g.material.opacity = (1 - i / 14) * .6; });
+      futU.uK.value = E.io2(seg(t, tFut - .3, tFut + 2.6)); sky.material.opacity = .85 * E.io2(seg(t, tFut, tFut + 2.4));
+      const v = (runX(t + .02) - runX(t - .02)) / .04;
+      const chase = { x: rx - 13, y: 4.2, z: 15, tx: rx + 10, ty: -.4, tz: 0, fov: 38 + clamp(v / 450) * 10, roll: -.02 };
+      const ahead = { x: X(2026) - 18, y: 6, z: 11, tx: X(2026) + 120, ty: -2, tz: -8, fov: 40, roll: 0 };
+      const dive = { x: X(1950) - 4, y: 1.2, z: 6, tx: X(1950) + 6, ty: 0, tz: 0, fov: 38, roll: 0 };
+      cam = mixP(mixP(dive, chase, E.io2(seg(t, tF0 + .2, tRun0 + .5))), ahead, E.io3(seg(t, tFut - .5, tFut + 2.2)));
+      cam.y += .15 * Math.sin(t * .9); cam.z += (t > tFut ? -1.5 * E.io2(seg(t, tFut, DUR)) : 0);
+      G.blur = [clamp(v / 420) * .04 * (inRun ? 1 : 0), 0];
+      G.flash = .9 * Math.exp(-Math.pow((t - tF0 - .1) / .18, 2)) + .25 * Math.exp(-Math.pow((t - tRun1) / .12, 2)); G.fade = E.io2(seg(t, DUR - 1.6, DUR - .1));
     }
     Object.assign(CAM, cam);
   } });

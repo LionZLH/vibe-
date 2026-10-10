@@ -135,7 +135,7 @@ const subSprite = () => { const cv = document.createElement('canvas'); cv.width 
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx, transparent: true, depthWrite: false })); s.scale.set(6.4, 1.6, 1); s.center.set(.5, 1);
   s.userData.set = (txt, col = '#5b5247') => { if (s.userData.cur === txt + col) return; s.userData.cur = txt + col; const g = cv.getContext('2d'); g.clearRect(0, 0, 640, 160); g.font = '700 96px PuHuiTi'; g.fillStyle = col; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, 320, 84); tx.needsUpdate = true; };
   return s; };
-const mk = (ch, x, z) => { const L = letterSprite(ch), S = subSprite(); L.renderOrder = S.renderOrder = 5; const g0 = new THREE.Group(); g0.add(L); S.position.y = -.05; g0.add(S); g0.position.set(x, 1.9, z); game.add(g0); return { g: g0, L, S }; };
+const mk = (ch, x, z) => { const L = letterSprite(ch), S = subSprite(); L.renderOrder = S.renderOrder = 8; L.material.depthTest = S.material.depthTest = false; /* 字母和标签浮在墙面之上，不被半透明墙压住 */ const g0 = new THREE.Group(); g0.add(L); S.position.y = -.05; g0.add(S); g0.position.set(x, 1.9, z); game.add(g0); return { g: g0, L, S }; };
 const LC = mk('C', -9.2, 0), LA = mk('A', 5.2, 0), LB = mk('B', 12.2, 0);
 LC.S.userData.set('提问的人');
 

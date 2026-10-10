@@ -88,7 +88,7 @@ const shake = (cam, t, t0, amp, dur = .6) => { if (t < t0 || t > t0 + dur) retur
   tRows.forEach((r, k) => tl.fromTo(r, { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: .45, ease: 'expo.out', immediateRender: false }, tW3 + .1 + k * .25));
   const xShade = shade(900, .85);
   tl.fromTo(xShade, { opacity: 0 }, { opacity: 1, duration: .3, immediateRender: false }, tW3 - .2).set(xShade, { opacity: 0 }, tW4 - .3);
-  const xCtr = el(null, `position:absolute;left:150px;top:700px;width:700px;text-align:left;font:700 40px/1 JBM;color:${COL.white};font-variant-numeric:tabular-nums`, '', { 'data-chk': 'text' }); hidden(xCtr);
+  const xCtr = el(null, `position:absolute;left:150px;top:820px;width:700px;text-align:left;font:700 40px/1 JBM;color:${COL.white};font-variant-numeric:tabular-nums`, '', { 'data-chk': 'text' }); hidden(xCtr);
   tl.set(xCtr, { opacity: 1 }, tX0 + .1).set(xCtr, { opacity: 0 }, tW4 - .3);
 
   /* ---- w4：1969 断口 + 余烬散落（「人员离散」） ---- */
@@ -246,7 +246,7 @@ const shake = (cam, t, t0, amp, dur = .6) => { if (t < t0 || t > t0 + dur) retur
     sg.fillStyle = '#000'; sg.fillRect(0, 0, SW, SH); sg.font = '700 44px CourierPrime'; sg.textBaseline = 'alphabetic';
     let left = n, y = 150, cx = 110, cy = 150;
     for (const [i, l] of RULE.entries()) { const k = Math.min(l.length, Math.max(0, left)); sg.fillStyle = i === 0 ? '#8a8a8a' : i === 2 ? '#fff' : '#d8d8d8'; sg.fillText(l.slice(0, k), 110, y); if (left > 0) { cx = 110 + sg.measureText(l.slice(0, k)).width; cy = y; } left -= l.length; if (left <= 0) break; y += 58; }
-    sg.fillStyle = "#fff"; if (blink) sg.fillRect(cx + 6, cy - 38, 24, 44);
+    sg.fillStyle = '#9a9a9a'; if (blink) sg.fillRect(cx + 6, cy - 38, 24, 44);   // 光标常亮、偏暗，不整块闪
     sg.fillStyle = '#5a5a5a'; sg.fillRect(110, 182, SW - 220, 3);
     scr.needsUpdate = true;
   };
@@ -317,10 +317,10 @@ const shake = (cam, t, t0, amp, dur = .6) => { if (t < t0 || t > t0 + dur) retur
     const inLisp = t >= tX4 - .3 && t < tX5 - .3;
     lisp.visible = lmo.visible = inLisp; wall.visible = !inLisp && t >= tWall0 - .2; mon.visible = bezel.visible = !inLisp && t < tX4 - .3; cmo.visible = t < tX4 - .3;
     conflicts.visible = t >= cw('x5', '打架') - .3 && t < tX6;
-    LOOK.crt(G, F);
+    LOOK.crt(G, F); F.flicker = 0; F.grain = .18; G.streak = 0;   // CRT 段：横向光痕会在字行之间拉出跳动的细线，关掉
     let cam;
     if (t < tWall0) {   // 一条规则打出来
-      drawScr(nAt(t), Math.floor(t * 2.5) % 2 === 0 || nAt(t) < NCH);
+      drawScr(nAt(t), true); mon.userData.u.uBright.value = .72;
       mon.scale.setScalar(1);
       const n = nAt(t), li = (() => { let s = 0; for (let i = 0; i < RULE.length; i++) { s += RULE[i].length; if (s >= n) return i; } return RULE.length - 1; })();
       const yy = 6 - (150 + Math.max(li, 3) * 58) / SH * 12, k = E.io2(seg(t, T0, tWall0));

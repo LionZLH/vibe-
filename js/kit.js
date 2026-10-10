@@ -115,7 +115,7 @@ export const sprite = (tex, s, rgb = [1, 1, 1], add = true) => { const sp = new 
 /* CRT 荧光屏：画布白字黑底 → 琥珀荧光 + 扫描线 + 弧面 + 暗角（HDR，字会发光） */
 export function crt(tex, w, h, o = {}) {
   const m = new THREE.ShaderMaterial({
-    uniforms: { uMap: { value: tex }, uOp: { value: 1 }, uTime: { value: 0 }, uGlitch: { value: 0 }, uPh: { value: new THREE.Vector3(...(o.ph || [2.2, 1.25, .32])) }, uLines: { value: o.lines || 420 }, uBright: { value: 1 } },
+    uniforms: { uMap: { value: tex }, uOp: { value: 1 }, uTime: { value: 0 }, uGlitch: { value: 0 }, uPh: { value: new THREE.Vector3(...(o.ph || [2.2, 1.25, .32])) }, uLines: { value: o.lines || 240 }, uBright: { value: 1 } },
     vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
     fragmentShader: `uniform sampler2D uMap; uniform float uOp, uTime, uGlitch, uLines, uBright; uniform vec3 uPh; varying vec2 vUv;
       float h(float n){ return fract(sin(n * 91.7) * 43758.5); }
@@ -124,7 +124,7 @@ export function crt(tex, w, h, o = {}) {
         float band = floor(uv.y * 40.); uv.x += uGlitch * (h(band + floor(uTime * 24.)) - .5) * .06 * step(.7, h(band * 3.1 + floor(uTime * 24.)));
         float inb = step(0., uv.x) * step(uv.x, 1.) * step(0., uv.y) * step(uv.y, 1.);
         float l = texture2D(uMap, uv).r + .35 * texture2D(uMap, uv + vec2(.0016, 0.)).r;
-        float sl = .72 + .28 * sin(uv.y * uLines * 6.2832);
+        float sl = .9 + .1 * sin(uv.y * uLines * 6.2832);   // 扫描线对比放低：太密太深在镜头移动时会出摩尔纹闪烁
         vec3 col = uPh * l * sl * uBright + vec3(.035, .022, .01);
         col *= 1. - smoothstep(.16, .26, r2);
         col += vec3(.05, .045, .04) * smoothstep(.5, 0., length(q - vec2(-.25, .3)));

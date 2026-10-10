@@ -249,7 +249,10 @@ shot({ name: 'open', t0: 0, t1: tA1 - .02, look(t) {
     origin.scale.setScalar(lerp(3.2, 9, dive));
   }
   Object.assign(CAM, cam);
-  flyMeshes.forEach(({ m }) => { const d = CAM.x - m.position.x, op = t > flyStart - 1 && t < tTitle0 + 1.4 ? E.io2(clamp((230 - d) / 90)) * (1 - seg(d, -10, -40)) : 0; m.visible = op > .005; m.userData.u.uOp.value = op; m.userData.u.uBright.value = .92 * (.35 + .65 * op); });
+  /* 照片随距离从远处「显影」出来：先亮后定、从下往上浮起；入场时按顺序错开，不一起蹦出来 */
+  flyMeshes.forEach(({ m }, i) => { const d = CAM.x - m.position.x, on = t > flyStart - 1 && t < tTitle0 + 1.4;
+    const kd = E.io2(clamp((120 - d) / 70)), kt = E.io3(seg(t, flyStart - .9 + i * .2, flyStart + .4 + i * .2)), op = on ? kd * kt * (1 - seg(d, -10, -40)) : 0;
+    m.visible = op > .005; m.userData.u.uOp.value = op; m.userData.u.uBright.value = .92 * (.35 + .65 * op) + .5 * (1 - op) * (op > 0 ? 1 : 0); m.position.y = 6.2 - (1 - op) * 1.8; m.scale.setScalar(.92 + .08 * op); });
   /* 调色：越往过去越褪色，琥珀保留 */
   const yr = t < tRun0 ? 2022 : t < flyStart - .3 ? yearOf(Math.min(X(2022), runX)) : t < flyStart ? 2022 : t < tTitle0 ? yearOf(camX(t)) : yearOf(camX2(t));
   const camYr = t < flyStart ? 2022 : yr;
