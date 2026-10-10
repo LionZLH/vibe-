@@ -1,0 +1,3 @@
+# OpenAI 发布页 "ChatGPT: Optimizing Language Models for Dialogue"，2022-11-30（Wayback 2022-12-01 快照）示例 1/4
+User: this code is not working like i expect — how do i fix it?
+ChatGPT: It's difficult to say what's wrong with the code without more context. Can you provide more information about what the code is supposed to do and what isn't working as expected? Also, is this the entire code or just a part of it?

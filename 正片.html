@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>014 期 · AI 七十年（开场样片）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@font-face{font-family:PuHuiTi;src:url(fonts/Alibaba-PuHuiTi-Heavy.otf);font-weight:900;font-display:block}
+@font-face{font-family:PuHuiTi;src:url(fonts/Alibaba-PuHuiTi-Bold.otf);font-weight:700;font-display:block}
+@font-face{font-family:PuHuiTi;src:url(fonts/Alibaba-PuHuiTi-Medium.otf);font-weight:500;font-display:block}
+@font-face{font-family:PuHuiTi;src:url(fonts/Alibaba-PuHuiTi-Regular.otf);font-weight:400;font-display:block}
+@font-face{font-family:JBM;src:url(fonts/JetBrainsMono-Bold.ttf);font-weight:700;font-display:block}
+@font-face{font-family:JBM;src:url(fonts/JetBrainsMono-Medium.ttf);font-weight:500;font-display:block}
+@font-face{font-family:SourceHanSerif;src:url(fonts/SourceHanSerifCN-Heavy.otf);font-weight:900;font-display:block}
+@font-face{font-family:SourceHanSerif;src:url(fonts/SourceHanSerifCN-Bold.otf);font-weight:700;font-display:block}
+@font-face{font-family:SourceHanSerif;src:url(fonts/SourceHanSerifCN-SemiBold.otf);font-weight:600;font-display:block}
+@font-face{font-family:EBGaramond;src:url(fonts/EBGaramond.ttf);font-weight:400 800;font-display:block}
+@font-face{font-family:EBGaramond;src:url(fonts/EBGaramond-Italic.ttf);font-weight:400 800;font-style:italic;font-display:block}
+@font-face{font-family:CourierPrime;src:url(fonts/CourierPrime-Regular.ttf);font-weight:400;font-display:block}
+@font-face{font-family:CourierPrime;src:url(fonts/CourierPrime-Bold.ttf);font-weight:700;font-display:block}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:#0c0a08;overflow:hidden;font-family:PuHuiTi,"PingFang SC",sans-serif}
+#gl{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#dom{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden}
+#film,#grain,#burn{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
+#grain{mix-blend-mode:overlay}
+#burn{mix-blend-mode:screen}
+#capbg{position:absolute;left:0;top:780px;width:1920px;height:300px;background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,.55) 70%,rgba(0,0,0,.62));pointer-events:none}
+#caps{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
+#ui{position:fixed;left:0;right:0;bottom:0;height:44px;background:#16161a;color:#ddd;display:flex;align-items:center;gap:14px;padding:0 16px;font:14px Menlo,monospace;z-index:9}
+#ui input{flex:1}
+body.export #ui{display:none}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="gl" width="1920" height="1080"></canvas><div id="dom"></div><canvas id="grain" width="1920" height="1080"></canvas><canvas id="film" width="1920" height="1080"></canvas><canvas id="burn" width="1920" height="1080"></canvas><div id="capbg"></div><div id="caps"></div></div>
+<div id="ui"><button id="pp">▶</button><span id="tm">0:00</span><input id="bar" type="range" min="0" max="1000" value="0"><span id="dur"></span></div>
+<script src="lib/gsap.min.js"></script>
+<script src="data/cues.js"></script>
+<script type="importmap">{"imports":{"three":"./lib/three/three.module.min.js","three/addons/":"./lib/three/addons/"}}</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
