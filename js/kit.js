@@ -1,6 +1,6 @@
 /* 各章共用的小工具：场景分区、照片（可带 2.5D 深度）、文字纹理、排版文件、浮尘、荧光条 */
 import { THREE, scene, plane, depthPhoto, loadTex, canvasTex } from './gl.js';
-import { lerp, clamp, hash } from './core.js';
+import { lerp, clamp, hash, tl as TL, el as EL, hidden as HID, COL as CC, onFrame } from './core.js';
 export const pose = (p, t, fov = 35, roll = 0) => ({ x: p.x, y: p.y, z: p.z, tx: t.x, ty: t.y, tz: t.z, fov, roll });
 export const mixP = (a, b, k) => { const o = {}; for (const key in a) o[key] = lerp(a[key], b[key], k); return o; };
 /* 每章一块远处的空地，互不穿帮 */
@@ -27,7 +27,7 @@ export function textMesh(str, h, o = {}) {
   return m;
 }
 /* 排版一页文件（打字机 / 铅字），{tag:文字} 记下外框；返回 {tex, marks, PW, PH} */
-export function typeset({ PW = 1700, PH = 2200, M = 150, top = 260, font = '400 46px CourierPrime', lh = 68, bg = '#ece5d3', ink = '#1b1612', head, text, justify = false }) {
+export function typeset({ PW = 1700, PH = 2200, M = 150, top = 260, font = '400 46px CourierPrime', lh = 68, bg = '#ece5d3', ink = '#1b1612', head, text, justify = false, hide = [] }) {
   const marks = {};
   const tex = canvasTex(PW, PH, g => {
     g.fillStyle = bg; g.fillRect(0, 0, PW, PH);
@@ -42,7 +42,7 @@ export function typeset({ PW = 1700, PH = 2200, M = 150, top = 260, font = '400 
       let line = [], cur = 0;
       const flush = last => {
         const wsum = line.reduce((s, [w]) => s + g.measureText(w).width, 0), gap = !justify || last || line.length < 2 ? sp : (W - wsum) / (line.length - 1); let x = M;
-        line.forEach(([w, tag]) => { const ww = g.measureText(w).width; g.fillText(w, x, y); if (tag) { const r = (marks[tag] = marks[tag] || []), b = r.find(q => q.y === y); if (b) b.x1 = x + ww; else r.push({ x0: x, x1: x + ww, y }); } x += ww + gap; });
+        line.forEach(([w, tag]) => { const ww = g.measureText(w).width; if (!hide.includes(tag)) g.fillText(w, x, y); if (tag) { const r = (marks[tag] = marks[tag] || []), b = r.find(q => q.y === y); if (b) { b.x1 = x + ww; b.text += ' ' + w; } else r.push({ x0: x, x1: x + ww, y, text: w }); } x += ww + gap; });
         y += lh; line = []; cur = 0;
       };
       words.forEach(wd => { const ww = g.measureText(wd[0]).width; if (line.length && cur + sp + ww > W) flush(false); cur += (line.length ? sp : 0) + ww; line.push(wd); });
@@ -85,3 +85,75 @@ export const LOOK = {
   crt: (G, F) => { G.sat = 1; G.tint = [1, .97, .92]; G.scurve = .3; G.bloom = .7; G.streak = .4; G.bg = [.018, .012, .006]; F.grain = .3; F.flicker = .15; F.scratch = 0; F.weave = 0; F.vig = .65; },
   digital: (G, F) => { G.sat = 1; G.tint = [1, 1, 1]; G.scurve = .3; G.bloom = .6; G.streak = .45; G.bg = [.03, .026, .022]; F.grain = .12; F.flicker = 0; F.scratch = 0; F.weave = 0; F.vig = .5; },
 };
+
+/* ---------- 四章以后共用 ---------- */
+/* 一行字（左对齐，可逐字打出）：userData.type(k) k=0→1 按字数显示；userData.u.uOp 透明度 */
+export function wipeText(str, h, o = {}) {
+  const fs = 200, font = (o.font || '900 200px SourceHanSerif').replace(/\d+px/, fs + 'px');
+  const cv = document.createElement('canvas').getContext('2d'); cv.font = font; if (o.ls) cv.letterSpacing = o.ls + 'px';
+  const w = Math.ceil(cv.measureText(str).width + 60), H = Math.round(fs * 1.35);
+  const cuts = [...str].map((_, i) => (30 + cv.measureText([...str].slice(0, i + 1).join('')).width) / w);
+  const tex = canvasTex(w, H, g => { g.font = font; if (o.ls) g.letterSpacing = o.ls + 'px'; g.fillStyle = o.color || '#f4efe6'; g.textBaseline = 'middle'; g.fillText(str, 30, H / 2 + fs * .04); });
+  const W = h * w / H;
+  const m = new THREE.ShaderMaterial({
+    uniforms: { uMap: { value: tex }, uOp: { value: 1 }, uCut: { value: 2 }, uBright: { value: o.hdr || 1 }, uSat: { value: 1 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+    fragmentShader: `uniform sampler2D uMap; uniform float uOp, uCut, uBright; varying vec2 vUv;
+      void main(){ vec4 c = texture2D(uMap, vUv); float k = step(vUv.x, uCut); gl_FragColor = vec4(c.rgb * uBright, c.a * uOp * k);
+#include <colorspace_fragment>
+      }`,
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: !o.hdr, blending: o.additive ? THREE.AdditiveBlending : THREE.NormalBlending,
+  });
+  const g = new THREE.PlaneGeometry(W, h); if (o.center) g.translate(0, 0, 0); else g.translate(W / 2 - 30 * h / H, 0, 0);
+  const mesh = new THREE.Mesh(g, m); mesh.userData.u = m.uniforms; mesh.userData.w = W;
+  mesh.userData.type = k => { const n = cuts.length, i = Math.floor(clamp(k) * n); m.uniforms.uCut.value = i <= 0 ? -1 : i >= n ? 2 : cuts[i - 1] + 1e-4; };
+  return mesh;
+}
+/* 光圈（标错的点） */
+export const ringTex = canvasTex(256, 256, g => { g.strokeStyle = '#fff'; g.lineWidth = 14; g.beginPath(); g.arc(128, 128, 100, 0, 7); g.stroke(); });
+export const sprite = (tex, s, rgb = [1, 1, 1], add = true) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false, blending: add ? THREE.AdditiveBlending : THREE.NormalBlending, color: new THREE.Color(...rgb) })); sp.scale.set(s, s, 1); return sp; };
+/* CRT 荧光屏：画布白字黑底 → 琥珀荧光 + 扫描线 + 弧面 + 暗角（HDR，字会发光） */
+export function crt(tex, w, h, o = {}) {
+  const m = new THREE.ShaderMaterial({
+    uniforms: { uMap: { value: tex }, uOp: { value: 1 }, uTime: { value: 0 }, uGlitch: { value: 0 }, uPh: { value: new THREE.Vector3(...(o.ph || [2.2, 1.25, .32])) }, uLines: { value: o.lines || 420 }, uBright: { value: 1 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+    fragmentShader: `uniform sampler2D uMap; uniform float uOp, uTime, uGlitch, uLines, uBright; uniform vec3 uPh; varying vec2 vUv;
+      float h(float n){ return fract(sin(n * 91.7) * 43758.5); }
+      void main(){
+        vec2 q = vUv - .5; float r2 = dot(q, q); vec2 uv = .5 + q * (1. + .09 * r2);
+        float band = floor(uv.y * 40.); uv.x += uGlitch * (h(band + floor(uTime * 24.)) - .5) * .06 * step(.7, h(band * 3.1 + floor(uTime * 24.)));
+        float inb = step(0., uv.x) * step(uv.x, 1.) * step(0., uv.y) * step(uv.y, 1.);
+        float l = texture2D(uMap, uv).r + .35 * texture2D(uMap, uv + vec2(.0016, 0.)).r;
+        float sl = .72 + .28 * sin(uv.y * uLines * 6.2832);
+        vec3 col = uPh * l * sl * uBright + vec3(.035, .022, .01);
+        col *= 1. - smoothstep(.16, .26, r2);
+        col += vec3(.05, .045, .04) * smoothstep(.5, 0., length(q - vec2(-.25, .3)));
+        gl_FragColor = vec4(col * inb, uOp);
+      }`,
+    transparent: true, depthWrite: false, toneMapped: false,
+  });
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); mesh.userData.u = m.uniforms; return mesh;
+}
+/* 左侧数据卡（ENIAC / Mark I 同款）：rows = [[数字, 单位, 小标]]；show(t0, t1)；rowAt(i, t) */
+/* 左侧压暗（放在 #dom 最底层，不盖住字和 HUD） */
+export const shade = (w = 1150, a = .9) => { const e = HID(EL(null, `position:absolute;left:0;top:0;width:${w}px;height:1080px;background:linear-gradient(90deg,rgba(8,7,6,${a}) 0%,rgba(8,7,6,${a * .75}) 45%,rgba(8,7,6,0) 100%)`)); e.parentElement.prepend(e); return e; };
+export function infoCard({ left = 150, top = 300, width = 640, title, rows = [], src, shade: useShade = true }) {
+  const sh = useShade ? shade() : null;
+  const box = HID(EL(null, `position:absolute;left:${left}px;top:${top}px;width:${width}px`));
+  if (title) EL(box, `position:relative;font:700 36px/1.2 JBM;color:${CC.amber};letter-spacing:3px;margin-bottom:34px`, title, { 'data-chk': 'text' });
+  const rs = rows.map(([n, u, lab]) => { const r = EL(box, 'position:relative;display:flex;align-items:baseline;gap:18px;padding:14px 0 16px;border-top:1px solid rgba(244,239,230,.18)');
+    if (lab) EL(r, `position:relative;min-width:150px;font:500 30px/1 PuHuiTi;color:${CC.mute}`, lab, { 'data-chk': 'text' });
+    EL(r, `position:relative;font:900 ${n.length > 9 ? 64 : 92}px/1 SourceHanSerif;color:${CC.white};white-space:nowrap`, n, { 'data-chk': 'text' });
+    if (u) EL(r, `position:relative;font:700 36px/1.2 PuHuiTi;color:#cfc6b8`, u, { 'data-chk': 'text' }); HID(r); return r; });
+  if (src) EL(box, `position:relative;margin-top:24px;font:500 28px/1.35 JBM;color:${CC.mute}`, src, { 'data-chk': 'text' });
+  const show = (t0, t1, rowTimes = []) => {
+    if (sh) TL.fromTo(sh, { opacity: 0 }, { opacity: 1, duration: .5, immediateRender: false }, t0).set(sh, { opacity: 0 }, t1);
+    TL.fromTo(box, { opacity: 0 }, { opacity: 1, duration: .4, immediateRender: false }, t0 + .15).set(box, { opacity: 0 }, t1);
+    rs.forEach((r, k) => TL.fromTo(r, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: .5, ease: 'expo.out', immediateRender: false }, rowTimes[k] ?? t0 + .5 + k * .45));
+  };
+  return { box, rows: rs, shade: sh, show };
+}
+/* 一行 DOM 字（居中），在 [t0, t1) 显示 */
+export function label(css, html, t0, t1) { const e = HID(EL(null, 'position:absolute;' + css, html, { 'data-chk': 'text' })); TL.fromTo(e, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .45, ease: 'expo.out', immediateRender: false }, t0).to(e, { opacity: 0, duration: .25 }, t1 - .25); return e; }
+/* 这一章的场景只在本章时间里可见 */
+export const only = (grp, t0, t1) => onFrame(t => { if (t < t0 || t >= t1) grp.visible = false; });

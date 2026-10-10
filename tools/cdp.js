@@ -3,7 +3,7 @@
 const http = require('http'), fs = require('fs'), path = require('path'), os = require('os'), { spawn } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROME = process.env.CHROME || (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 const PORT = 8825, DEBUG_PORT = 9355;
 const TYPE = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mp3': 'audio/mpeg',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json', '.md': 'text/plain; charset=utf-8', '.otf': 'font/otf', '.ttf': 'font/ttf', '.svg': 'image/svg+xml', '.mjs': 'text/javascript; charset=utf-8' };
@@ -33,7 +33,7 @@ async function launch() {
   const prof = fs.mkdtempSync(path.join(os.tmpdir(), 'ep014-cdp-'));
   const chrome = spawn(CHROME, ['--headless=new', `--user-data-dir=${prof}`, `--remote-debugging-port=${DEBUG_PORT}`,
     '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--mute-audio', '--window-size=1920,1080',
-    '--autoplay-policy=no-user-gesture-required', '--use-angle=metal', '--enable-gpu-rasterization', '--ignore-gpu-blocklist', '--disable-background-timer-throttling', '--disable-renderer-backgrounding',
+    '--autoplay-policy=no-user-gesture-required', ...(process.platform === 'darwin' ? ['--use-angle=metal'] : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox']), '--enable-gpu-rasterization', '--ignore-gpu-blocklist', '--disable-background-timer-throttling', '--disable-renderer-backgrounding',
     '--disable-backgrounding-occluded-windows', 'about:blank'], { stdio: 'ignore' });
   let list;
   for (let i = 0; i < 100; i++) {
