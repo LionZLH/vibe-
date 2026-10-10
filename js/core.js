@@ -95,3 +95,7 @@ export function buildCaptions(KEYS) {
     });
   });
 }
+
+/* ---------- 音效：镜头代码在画面事件发生的地方登记（时间 = 片中秒），tools/音效表.js 读出来交给 tools/混音.py 合成 ---------- */
+export const SFX = []; window.SFX = SFX;
+export const sfx = (t, kind, o = {}) => { if (Number.isFinite(t) && t >= 0) SFX.push({ t: +t.toFixed(3), kind, ...o }); };

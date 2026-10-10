@@ -5,7 +5,7 @@
    尾声（e1–e8）：IMO 35/42 → 代理：写代码、查资料、操作电脑 → 沿轴倒飞回 1950，胶片一层层变回银盐 → 论文最后一句 → 全轴 */
 import { THREE, scene, CAM, G, canvasTex, loadTex, plane } from '../gl.js';
 import { F } from '../film.js';
-import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot, DUR, track, onFrame } from '../core.js';
+import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot, DUR, track, onFrame, sfx } from '../core.js';
 import { X, LANE, spineState, glow } from '../spine.js';
 import { stage, photo, textMesh, typeset, doc, motes, pose, mixP, LOOK, wipeText, ringTex, sprite, infoCard, label, only, shade } from '../kit.js';
 import { chapterAt } from '../chapter.js';
@@ -98,6 +98,11 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
   const sc = textMesh('4 : 1', 7, { font: '900 200px SourceHanSerif', color: '#f2b33d', hdr: 1.15 }); score.add(sc);
   const scL = textMesh('AlphaGo  ·  李世石', 1, { font: '700 200px PuHuiTi', color: '#cfc6b8' }); scL.position.y = -4.6; score.add(scL);
 
+  sfx(T0, 'flash', { g: .4 }); sfx(cw('h2', '围棋的变化') - .2, 'boom', { g: .6 }); sfx(cw('h2', '宇宙原子') - .2, 'impact', { g: .5 });
+  for (let k = 0; k < 60; k++) sfx(lerp(tH3 - .1, tH4 - .5, k / 60), 'tick', { g: .08 + .06 * (k / 60), f: 1800 + (k % 5) * 200 });
+  MV.forEach((_, i) => { if (i === 36) return; sfx(moveT[i] + .1, 'stone', { g: i > 36 ? .3 : .45 }); });
+  sfx(t37 - .6, 'riser', { d: .6, g: .4 }); sfx(t37 + .3, 'stone', { g: 1.2 }); sfx(t37 + .32, 'boom', { g: 1 }); sfx(t37 + .32, 'shimmer', { d: 3, g: .5 });
+  sfx(cw('h5', '概率') - .4, 'impact', { g: .5 }); sfx(tH7 - .1, 'boom', { g: 1 });
   shot({ name: 'ch9', t0: T0, t1: T1, look(t) {
     LOOK.digital(G, F); grp.visible = true; spineState({ on: false });
     lee.visible = t < tH2 - .3; big.visible = t >= tH2 - .3 && t < tH3 - .3; minis.visible = t >= tH3 - .3 && t < tH4 - .4; gb.visible = t >= tH4 - .4 && t < tH7 - .3; score.visible = t >= tH7 - .3;
@@ -201,6 +206,11 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
   const gptSub = wipeText('Generative Pre-trained Transformer', .9, { font: '500 200px JBM', color: '#cfc6b8' }); gptSub.position.set(240 - gptSub.userData.w / 2, -1.6, 0); grp.add(gptSub);
   const hiT = new THREE.Mesh(new THREE.PlaneGeometry(1, .08), new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.45, .42), toneMapped: false })); hiT.geometry.translate(.5, 0, 0); grp.add(hiT);
 
+  sfx(T0, 'paper', { g: .8 }); sfx(cw('t1', '注意力就是一切') - .2, 'marker');
+  [...'Transformer'].forEach((_, i) => sfx(tT2 + .1 + i * .8 / 11, 'type', { g: .35 })); sfx(tT2 + .1, 'shimmer', { d: 1.5, g: .4 });
+  sfx(cw('t3', '同时') - .2, 'swell', { d: 1.4, g: .5 }); sfx(cw('t3', '自己决定'), 'chime', { g: .6 });
+  for (let i = 0; i < 24; i++) sfx(tT4 - .1 + (tT5 - .7 - tT4) * (i / 24) + .25, 'thud', { g: .25 + .01 * i });
+  sfx(cw('t5', '正来源于此') - .3, 'chime', { g: .6 });
   shot({ name: 'ch10', t0: T0, t1: T1, look(t) {
     LOOK.digital(G, F); grp.visible = true; spineState({ on: false });
     page.visible = hiTitle.visible = pmo.visible = t < tT2 - .3; tw.visible = t >= tT2 - .3 && t < tT3 - .3; sent.visible = t >= tT3 - .3 && t < tT4 - .3; tower.visible = t >= tT4 - .3 && t < tT5 - .3; gpt.visible = gptSub.visible = hiT.visible = t >= tT5 - .3;
@@ -294,6 +304,10 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
   const qpts = new THREE.Points(qg, pointsMat([2.2, 1.6, .9], .09)); qpts.frustumCulled = false; grp.add(qpts);
   const tFly = cw('s7', '飞入') - .4;
 
+  sfx(cw('s1', '押注') - .2, 'impact', { g: .5 }); [tS2, tS3, tS4].forEach((x, i) => { sfx(x - .1, 'whoosh', { d: .6 + i * .5, g: .4 + i * .2 }); sfx(x + .1, 'shimmer', { d: 1 + i, g: .3 + i * .15 }); }); sfx(tS4, 'boom', { g: .7 });
+  sfx(tS5 - .3, 'riser', { d: tS6 - tS5 - .5, g: .6 });
+  [...'this code is not working like i expect — how do i fix it?'].forEach((_, i) => sfx(tS6 + .3 + i / 46, 'key', { g: .25 }));
+  sfx(tS7 - .3, 'flash', { g: .5 }); sfx(tFly, 'swell', { d: 3, g: .9 }); sfx(tFly, 'shimmer', { d: 4, g: .6 });
   shot({ name: 'ch11', t0: T0, t1: T1, look(t) {
     LOOK.digital(G, F);
     const onSpine = t < tS2 - .3 || (t >= tS5 - .3 && t < tS6 - .3);
@@ -358,6 +372,8 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
   const headG = glow(0, 0, 0, 4, onSp);
   const y55 = textMesh('55 年', 13, { font: '900 200px SourceHanSerif', color: '#f2b33d', hdr: 1.1 }); y55.position.set(X(1996.5), 40, 4); onSp.add(y55);
   const tArc0 = cw('n3', '55 年后') - .8, tArc1 = cw('n3', '诺贝尔') + .3;
+  sfx(T0, 'flash', { g: .4 }); sfx(tN2 - .3, 'flash', { g: .5 }); sfx(tN3 - .3, 'whoosh', { d: 1, g: .6 });
+  sfx(tArc0, 'riser', { d: tArc1 - tArc0, g: .8 }); sfx(tArc1, 'chime', { g: .9 }); sfx(tArc1, 'boom', { g: .7 });
   shot({ name: 'ch12', t0: T0, t1: T1, look(t) {
     LOOK.digital(G, F);
     const onSpine = t >= tN3 - .3;
@@ -450,6 +466,12 @@ const pointsMat = (rgb, size, op = 1) => new THREE.PointsMaterial({ color: new T
     onFrame(t => { if (t < tT) { finS.textContent = ''; return; } const k = Math.floor(clamp((t - tT) * 16, 0, full.length)), del = Math.floor(clamp((t - tDel) * 7, 0, 4)); finS.textContent = full.slice(0, k - del) + (t < tDel + .6 || Math.floor(t * 1.7) % 2 === 0 ? '▍' : ' '); }); }
   tl.to(fin, { opacity: 0, duration: 1.4 }, DUR - 1.6);
 
+  { const tc = cw('e2', '金牌级') - .9; for (let i = 0; i < 6; i++) sfx(tc + i * .22, 'tick', { g: .3, f: i < 5 ? 1200 : 300 }); sfx(tc + 1.4, 'chime', { g: .5 }); }
+  [...'def mean(xs):'].forEach((_, i) => sfx(cw('e3', '写代码') - .2 + i / 34, 'key', { g: .22 })); [...'搜索：Lighthill'].forEach((_, i) => sfx(cw('e3', '查资料') - .2 + i / 30, 'key', { g: .22 })); sfx(cw('e3', '操作电脑') + .35, 'click', { g: .6 });
+  sfx(tBack0, 'riser', { d: tBack1 - tBack0, g: .7 }); sfx(tBack0, 'whoosh', { d: tBack1 - tBack0 + .3, g: .6 }); sfx(tBack1 + .3, 'paper', { g: .7 }); sfx(cw('e4', '机器能思考吗') - .1, 'marker');
+  sfx(tE6 - .3, 'paper', { g: .6 }); { const n = last.marks.l.reduce((a, r) => a + r.text.length, 0), d = ce('e7') - tE7 + .1; for (let i = 0; i < n; i += 1) sfx(tE7 - .1 + d * i / n, 'type', { g: .3 }); }
+  sfx(tF0 - .7, 'swell', { d: .9, g: .7 }); sfx(tRun0, 'whoosh', { d: tRun1 - tRun0, g: .7 }); sfx(tRun1, 'shimmer', { d: 4, g: .5 }); sfx(tTitle, 'boom', { g: .9 });
+  for (let k = 0; k < 4; k++) sfx(tTitle + 3.1 + k / 7, 'key', { g: .2 });
   shot({ name: 'epilogue', t0: T0, t1: T1, look(t) {
     let cam;
     const onSpine = t < tE2 - .3 || (t >= tBack0 && t < tBack1 + .3) || t >= tE8 - .3;

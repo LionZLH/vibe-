@@ -4,7 +4,7 @@ const http = require('http'), fs = require('fs'), path = require('path'), os = r
 
 const ROOT = path.join(__dirname, '..');
 const CHROME = process.env.CHROME || (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
-const PORT = 8825, DEBUG_PORT = 9355;
+const PORT = +process.env.CDP_PORT || 8825, DEBUG_PORT = +process.env.CDP_DEBUG_PORT || 9355;   // 并行导出时每个进程用自己的端口
 const TYPE = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mp3': 'audio/mpeg',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json', '.md': 'text/plain; charset=utf-8', '.otf': 'font/otf', '.ttf': 'font/ttf', '.svg': 'image/svg+xml', '.mjs': 'text/javascript; charset=utf-8' };
 const sleep = ms => new Promise(r => setTimeout(r, ms));

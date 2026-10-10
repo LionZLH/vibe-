@@ -1,7 +1,7 @@
 /* 冷开场（c1–c2）对话散成星海 → 星海塌缩（c3）→ 光从 2022 往回跑出时间轴（c4）→ 时间长廊倒飞（c5）→ 1969 断口 → 片名 */
 import { THREE, scene, camera, renderer, CAM, G, plane, loadTex, canvasTex } from '../gl.js';
 import { F } from '../film.js';
-import { tl, c, ce, cw, COL, el, hidden, typeOn, seg, lerp, clamp, E, track, hash, shot } from '../core.js';
+import { tl, c, ce, cw, COL, el, hidden, typeOn, seg, lerp, clamp, E, track, hash, shot, sfx } from '../core.js';
 import { X, LANE, spineState, head, origin, glow } from '../spine.js';
 
 /* ================= 1. 2022：第一段对话（发布页原文） ================= */
@@ -191,6 +191,15 @@ tl.to(hud, { opacity: 1, duration: .3 }, tRun0 + .3).to(hud, { opacity: 0, durat
 
 /* ================= 每帧 ================= */
 const mix = (a, b, k) => { const o = {}; for (const key in a) o[key] = lerp(a[key], b[key], k); return o; };
+/* 音效 */
+[...Q].forEach((_, i) => sfx(c('c1') + .05 + i / 40, 'key', { g: .32 }));
+words.forEach((_, i) => sfx(tq + .45 + i * (c('c2') - .35 - tq - .45) / words.length, 'tick', { g: .12, f: 2400 }));
+sfx(tCol, 'shimmer', { d: 1.6, g: .7 }); sfx(t1m - .15, 'boom', { g: .45 }); sfx(t1y - .1, 'swell', { d: 2.2, g: .8 });
+sfx(tCollapse0, 'suck', { d: tCollapse1 - tCollapse0 }); sfx(tCollapse1, 'impact', { g: .8 });
+sfx(tRun0, 'riser', { d: tRun1 - tRun0, g: .6 }); sfx(flyStart - .6, 'whoosh', { d: 1.4, g: .8 });
+sfx(tW - 1, 'ice', { d: 1.8, g: .7 }); sfx(tDeath - .02, 'slice', { g: 1 }); sfx(tDeath, 'sparks', { d: 2 });
+sfx(tTitle0 + .7, 'whoosh', { d: 1, g: .6 }); sfx(tTitle0 + 1, 'boom', { g: 1 }); sfx(tTitle0 + 1, 'shimmer', { d: 2.5, g: .6 });
+sfx(tA1 - 1.25, 'whoosh', { d: 1.3, g: .7 }); sfx(tA1, 'flash', { g: .8 });
 shot({ name: 'open', t0: 0, t1: tA1 - .02, look(t) {
   const u = pm.uniforms; u.uTime.value = t;
   /* 光尘 + 星海 */

@@ -5,7 +5,7 @@
    → 26.2% vs 15.3% → 2012 学习轨炸亮 → 苏茨克维 */
 import { THREE, scene, CAM, G, canvasTex, loadTex, plane } from '../gl.js';
 import { F } from '../film.js';
-import { tl, c, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot } from '../core.js';
+import { tl, c, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot, sfx } from '../core.js';
 import { X, LANE, spineState, glow } from '../spine.js';
 import { stage, photo, textMesh, typeset, doc, motes, pose, mixP, LOOK, wipeText, ringTex, sprite, infoCard, label, only, shade } from '../kit.js';
 import { chapterAt } from '../chapter.js';
@@ -109,6 +109,11 @@ const digitMesh = (d, col, s = 1) => {
   chkCard.show(cw('y6', '一成以上') - .4, tY7 - 1.9);
   const cmo = motes(200, [20, 12, 8], 62, .3); cmo.position.set(220, 0, 3); grp.add(cmo);
 
+  sfx(T0, 'ignite', { g: .7 }); sfx(tY2 - .3, 'paper', { g: .8 }); sfx(cw('y2', '反向传播') - .2, 'marker');
+  for (let t0 = tTr0; t0 < tY4 - .2; t0 += 1 / 1.3) { sfx(t0, 'blip', { f: 660, g: .12 }); sfx(t0 + .38, 'blip', { f: 440, g: .1 }); }
+  sfx(tSolve, 'chime', { g: .8 });
+  for (let k = 0; k < 18; k++) sfx(cw('y5', '手写数字') - 1.2 + k * .12, 'tick', { g: .14, f: 2000 });
+  sfx(tY6 - .3, 'paper', { g: .7 }); AMT.forEach((_, k) => sfx(cw('y6', '支票') - .4 + k * .18, 'beep', { g: .25 })); sfx(tY7 - .3, 'whoosh', { d: 1.4, g: .6 });
   shot({ name: 'ch6', t0: T0, t1: T1, look(t) {
     const onSpine = t < tY2 - .3 || t >= tY7 - .3;
     grp.visible = !onSpine; onSp.visible = true; flame.visible = onSpine;
@@ -268,6 +273,10 @@ const digitMesh = (d, col, s = 1) => {
   const qMark = textMesh('？', 1.8, { font: '900 200px SourceHanSerif', color: '#b9c8dc' }); qMark.rotation.x = -Math.PI / 2; qMark.position.set(0, .02, 0); qMark.material.depthTest = false; qMark.renderOrder = 6; ttt.add(qMark);
   const tttLab = label(`left:0;top:150px;width:1920px;text-align:center;font:900 64px/1 SourceHanSerif;color:#b9c8dc;letter-spacing:6px`, '换个游戏：井字棋', cw('z4', '换个') - .2, T1);
 
+  sfx(T0, 'flash', { g: .4 });
+  MOVES.forEach((_, i) => { sfx(plyT[i] + .2, 'clack', { g: all.some(o => Math.abs(o.dead - plyT[i] - .18) < .01) ? 1 : .6 }); if (i >= 12 && plyT[i] < tZ4 - .4) sfx(plyT[i], 'burst', { g: .35 }); });
+  sfx(tZ2 - .3, 'flash', { g: .5 }); sfx(tZ4 - .45, 'down', { d: 1.2, g: .5 }); [0, 1, 2, 3].forEach(j => sfx(cw('z4', '换个') - .2 + j * .1, 'tick', { g: .25, f: 700 }));
+  sfx(cw('z4', '全都不会') - .1, 'blip', { f: 196, g: .3 });
   shot({ name: 'ch7', t0: T0, t1: T1, look(t) {
     LOOK.digital(G, F); G.bloom = .55; F.grain = .18; F.vig = .55;
     spineState({ on: false });
@@ -379,6 +388,12 @@ const digitMesh = (d, col, s = 1) => {
   iCard.show(cw('g8', '伊利亚') - .4, T1 - .2);
   const tBoom = cw('g7', '倒向') - .5;
 
+  sfx(cw('g1', '两样东西') - .2, 'impact', { g: .4 }); sfx(tG2 - .3, 'flash', { g: .5 });
+  sfx(cw('g2', '收集') - .2, 'whoosh', { d: tG3 - cw('g2', '收集'), g: .7 }); sfx(cw('g2', '收集') - .1, 'swell', { d: 2, g: .4 });
+  sfx(tG3 - .3, 'shimmer', { d: 3, g: .4 }); sfx(tG4 - .3, 'flash', { g: .5 }); sfx(tG4, 'shimmer', { d: 1.6, g: .4 }); sfx(cw('g4', '海量并行') - .2, 'pulse', { d: tG5 - cw('g4', '海量并行'), g: .5 });
+  sfx(tG5 - .3, 'whoosh', { d: .8, g: .5 }); for (let k = 0; k < 20; k++) sfx(tG5 + k * .17, 'term', { g: .12 });
+  sfx(cw('g6', '15.3%') - .3, 'rise', { d: .9, g: .5 }); sfx(cw('g6', '26.2%') - .2, 'rise', { d: .9, g: .4 });
+  sfx(tBoom - 1.6, 'riser', { d: 1.6, g: .7 }); sfx(tBoom, 'boom', { g: 1.1 }); sfx(tBoom, 'sparks', { d: 2.4, g: .6 }); sfx(cw('g8', '伊利亚') - .4, 'flash', { g: .5 });
   shot({ name: 'ch8', t0: T0, t1: T1, look(t) {
     LOOK.digital(G, F);
     const onSpine = t < tG2 - .3 || (t >= tG7 - .3 && t < cw('g8', '伊利亚') - .4);

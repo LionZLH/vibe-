@@ -2,7 +2,7 @@
    左上角年份 HUD 全片共用（片名之后一直在）。 */
 import { THREE, scene, CAM, G } from './gl.js';
 import { F } from './film.js';
-import { tl, c, CUES, COL, el, hidden, seg, lerp, clamp, E, track, shot, hash } from './core.js';
+import { tl, c, CUES, COL, el, hidden, seg, lerp, clamp, E, track, shot, hash, sfx } from './core.js';
 import { X, LANE, spineState } from './spine.js';
 import { textMesh, mixP, LOOK } from './kit.js';
 export const CH = [
@@ -45,6 +45,8 @@ export function hudFrame(t) {
   else { HUD.year = 1950; HUD.name = '一 · 提问'; }
   hudY.textContent = HUD.year; hudName.textContent = HUD.name;
 }
+/* 音效：沿轴飞 → 章名牌落定 → 甩出去 */
+CH.forEach(ch => { sfx(ch.t0, 'whoosh', { d: ch.t1 - ch.t0 - 1.2, g: .7 }); sfx(ch.t1 - 1.2, 'impact', { g: .45 }); sfx(ch.t1 - 1.15, 'shimmer', { d: 1.4, g: .35 }); sfx(ch.t1 - .4, 'whip', { g: .7 }); });
 /* 转场镜头 */
 const winterK = y => (y > 1973 && y < 1981) || (y > 1986.5 && y < 1994) ? 1 : 0;
 CH.forEach((ch, i) => {

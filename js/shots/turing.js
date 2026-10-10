@@ -2,7 +2,7 @@
    → 电传纸走纸打出论文里的示范问答 → ENIAC 机房（2.5D）→ 甩回时间轴 */
 import { THREE, scene, CAM, G, plane, depthPhoto, loadTex, canvasTex } from '../gl.js';
 import { F } from '../film.js';
-import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, track, hash, shot } from '../core.js';
+import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, track, hash, shot, sfx } from '../core.js';
 import { X, spineState, glow } from '../spine.js';
 import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
@@ -209,6 +209,12 @@ const camEnd = track([[tOut + .3, X(1950)], [tOut + 1.7, X(1955)]]);
 /* ================= 每帧 ================= */
 const tQ = cw('a2', '机器能思考吗'), tS = cw('a3', '空谈'), tR = cw('a3', '设计');
 const tG0 = tA4 - .3, tSwap = cw('a4', '人机') - .15;
+/* 音效 */
+sfx(tA2 - .55, 'paper', { g: .8 }); sfx(tQ + .05, 'marker'); sfx(tS, 'marker', { g: .7 }); sfx(tR, 'marker');
+sfx(tG0 - .9, 'whoosh', { d: 1, g: .6 }); sfx(tG0 + .4, 'thud', { g: .5 }); [0, 1, 2].forEach(k => sfx(tSwap + k * .42, 'tick', { g: .35, f: 900 }));
+sfx(tTape - .7, 'whoosh', { d: .8, g: .6 });
+charT.forEach(([t0, n, cps]) => { for (let i = 0; i < n; i++) sfx(t0 + i / cps, 'teletype', { g: .38 }); sfx(t0 + n / cps + .05, 'bell', { g: .25 }); });
+sfx(tNote, 'marker'); sfx(tE, 'flash', { g: .6 }); sfx(tE, 'hum', { d: tOut - tE + .3, g: .35 }); sfx(tOut - .2, 'whip', { g: .8 });
 shot({ name: 'turing', t0: tA1 - .02, t1: c('b1') - 2.65, look(t) {
   spineState({ on: t > tOut + .3, labels: 1, axis: 1, lanes: 1, ice: [0, 0], cut: 0, cutLabel: 0, head: 0, origin: 1 });
   grp.visible = t < tOut + .3;

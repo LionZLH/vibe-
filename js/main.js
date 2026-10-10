@@ -36,12 +36,15 @@ window.seekSync = t => { curT = t; frame(t); };
 const fmt = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}.${Math.floor(t * 10 % 10)}`;
 const $ = id => document.getElementById(id);
 function updUI() { $('tm').textContent = fmt(curT); $('bar').value = Math.round(curT / DUR * 1000); }
+/* 声音：有 配音/成片混音.mp3（tools/混音.py 生成）就跟着播；播放时以音频时钟为准，声画不漂。M 键静音 */
+const AUD = EXPORT ? null : new Audio('配音/成片混音.mp3'); let hasAud = false;
+if (AUD) { AUD.preload = 'auto'; AUD.addEventListener('canplaythrough', () => hasAud = true, { once: true }); AUD.addEventListener('error', () => hasAud = false); }
 let playing = false, t0w = 0, t0 = 0;
-const stop = () => { playing = false; $('pp').textContent = '▶'; };
-function loop() { if (!playing) return; const t = t0 + (performance.now() - t0w) / 1000; if (t >= DUR) { frame(DUR); curT = DUR; updUI(); return stop(); } curT = t; frame(t); updUI(); requestAnimationFrame(loop); }
-$('pp').onclick = () => { if (playing) return stop(); playing = true; $('pp').textContent = '❚❚'; t0 = curT >= DUR - .1 ? 0 : curT; t0w = performance.now(); loop(); };
+const stop = () => { playing = false; $('pp').textContent = '▶'; if (AUD) AUD.pause(); };
+function loop() { if (!playing) return; const t = hasAud && !AUD.paused ? AUD.currentTime : t0 + (performance.now() - t0w) / 1000; if (t >= DUR) { frame(DUR); curT = DUR; updUI(); return stop(); } curT = t; frame(t); updUI(); requestAnimationFrame(loop); }
+$('pp').onclick = () => { if (playing) return stop(); playing = true; $('pp').textContent = '❚❚'; t0 = curT >= DUR - .1 ? 0 : curT; t0w = performance.now(); if (hasAud) { AUD.currentTime = t0; AUD.play().catch(() => {}); } loop(); };
 $('bar').oninput = e => { stop(); seek(e.target.value / 1000 * DUR); };
-addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); $('pp').click(); } if (e.code === 'ArrowRight') { stop(); seek(curT + 2); } if (e.code === 'ArrowLeft') { stop(); seek(curT - 2); } });
+addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); $('pp').click(); } if (e.code === 'ArrowRight') { stop(); seek(curT + 2); } if (e.code === 'ArrowLeft') { stop(); seek(curT - 2); } if (e.code === 'KeyM' && AUD) AUD.muted = !AUD.muted; });
 $('dur').textContent = fmt(DUR);
 const q = new URLSearchParams(location.search);
 await seek(+(q.get('t') || 0));

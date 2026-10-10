@@ -4,7 +4,7 @@
    → 规则互相打架 → 1987 墙碎 → 第二次结霜 */
 import { THREE, scene, CAM, G, canvasTex } from '../gl.js';
 import { F } from '../film.js';
-import { tl, c, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot } from '../core.js';
+import { tl, c, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot, sfx } from '../core.js';
 import { X, LANE, spineState, glow } from '../spine.js';
 import { stage, photo, textMesh, typeset, doc, motes, pose, mixP, LOOK, wipeText, ringTex, sprite, crt, infoCard, label, only, shade } from '../kit.js';
 import { chapterAt } from '../chapter.js';
@@ -134,6 +134,12 @@ const shake = (cam, t, t0, amp, dur = .6) => { if (t < t0 || t > t0 + dur) retur
   const fundLab = textMesh('经费（示意）', 1.1, { font: '700 200px PuHuiTi', color: '#b9c8dc' }); fundLab.position.set(X(1963.5), LANE.rule + 9.9, 0); onSp.add(fundLab);
   const tFund = cw('w9', '大砍经费') - .3, tIce = cw('w9', '寒冬') - .9;
 
+  sfx(tLand - .5, 'whoosh', { d: .5, g: .6 }); sfx(tLand, 'impact', { g: 1.1 }); sfx(tLand, 'paper', { g: .5 });
+  tAtt.forEach((t0, i) => { sfx(t0, 'tick', { g: .28, f: 1500 }); sfx(t0 + .25, 'blip', { f: att[i].n === 3 ? 520 : 260, g: .15 }); });
+  sfx(tCut - .02, 'slice'); sfx(tCut, 'sparks', { d: 2 }); sfx(tScat, 'crackle', { d: 2.5, g: .5 });
+  rLines.forEach((m, i) => { const n = [...RL[Math.min(i, RL.length - 1)]].length, d = i ? Math.min(.55, Math.max(.12, (tRule[Math.min(NR - 1, i + 1)] - tRule[i]) * .8)) : .9; if (i < 24) for (let k = 0; k < n; k += i > 10 ? 3 : 1) sfx(tRule[i] + d * k / n, 'type', { g: i > 10 ? .18 : .35 }); });
+  sfx(tW7 - .3, 'paper', { g: .8 }); sfx(cw('w8', '没有任何'), 'marker');
+  sfx(tFund - .9, 'down', { d: 2, g: .4 }); sfx(tIce, 'ice', { d: 2.6, g: .9 }); sfx(tIce, 'wind', { d: T1 - tIce, g: .5 });
   shot({ name: 'ch4', t0: T0, t1: T1, look(t) {
     const onSpine = (t >= tW4 - .3 && t < tW5 - .3) || t >= tW9 - .4;
     grp.visible = !onSpine; onSp.visible = true;
@@ -310,6 +316,11 @@ const shake = (cam, t, t0, amp, dur = .6) => { if (t < t0 || t > t0 + dur) retur
   const aiWord = textMesh('“AI”', 6, { font: '900 200px SourceHanSerif', color: '#f4efe6' }); aiWord.position.set(X(1990), 11, -2); onSp.add(aiWord);
   const tIce = cw('x7', '寒冬') - .7, tAfraid = cw('x7', '不敢提');
 
+  sfx(T0, 'crt_on', { g: .8 }); for (let i = 0; i < NCH; i += 2) sfx(tType0 + i / CPS, 'term', { g: .16 });
+  sfx(tWall0, 'whoosh', { d: 1.6, g: .6 }); for (let i = 0; i < 40; i++) sfx(tWall0 + (tWallN - tWall0) * Math.pow(i / 40, .8), 'blip', { f: 1200 + (i % 7) * 140, g: .08 });
+  sfx(tX4 - .3, 'flash', { g: .5 });
+  for (let i = 0; i < 9; i++) sfx(lerp(cw('x5', '打架') - .2, tX6 - .5, i / 8) + (hash(i * 3.3) - .5) * .2, 'glitch', { g: .4 });
+  sfx(tCrash - .05, 'shatter', { g: 1 }); sfx(tCrash, 'boom', { g: .9 }); sfx(tIce, 'ice', { d: 2.4, g: .8 }); sfx(tIce, 'wind', { d: T1 - tIce, g: .5 });
   shot({ name: 'ch5', t0: T0, t1: T1, look(t) {
     const onSpine = t >= tX7 - .4;
     grp.visible = !onSpine; onSp.visible = true; aiWord.visible = onSpine;

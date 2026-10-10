@@ -2,7 +2,7 @@
    三 · 另一条路（d1–d8）：罗森布拉特 → 感知机真跑 50 次（400 个光电管 + 权重）→ 1958 年报纸原句 → Mark I 原机 → 两条轨 */
 import { THREE, CAM, G, canvasTex } from '../gl.js';
 import { F } from '../film.js';
-import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot } from '../core.js';
+import { tl, c, ce, cw, COL, el, hidden, letters, typeOn, seg, lerp, clamp, E, hash, shot, sfx } from '../core.js';
 import { X, LANE, spineState } from '../spine.js';
 import { stage, photo, textMesh, typeset, doc, motes, pose, mixP, LOOK, only } from '../kit.js';
 import { chapterAt } from '../chapter.js';
@@ -36,6 +36,7 @@ import { chapterAt } from '../chapter.js';
   /* 规则轨标注 */
   const ruleLab = textMesh('规则', 2.2, { color: '#dfe6ee', font: '900 200px SourceHanSerif' }); ruleLab.position.set(X(1956) + 4, LANE.rule + 2.4, 0); ruleLab.visible = false; S.grp.parent.add(ruleLab); only(ruleLab, T0, T1);
   const tB2 = cw('b2', '人工智能'), tB3m = cw('b3', '一群科学家'), tB3s = cw('b3', '一个夏天'), tB4 = c('b4'), tB5 = c('b5');
+  sfx(tB2 - 1.1, 'paper', { g: .8 }); sfx(tB2, 'marker'); sfx(tB3m - .1, 'marker'); sfx(tB3s, 'marker'); sfx(tB4 - .5, 'boom', { g: .7 }); sfx(tB5 - .4, 'whoosh', { d: 1, g: .6 });
   shot({ name: 'ch2', t0: T0, t1: T1, look(t) {
     LOOK.silver(G, F);
     spineState({ on: t > tB5 - .4, axis: 1, labels: 1, lanes: 1, ice: [0, 0], head: 0, origin: 1 });
@@ -140,6 +141,8 @@ import { chapterAt } from '../chapter.js';
   tl.set(mkData, { opacity: 1 }, tD6 + .2).set(mkData, { opacity: 0 }, tD7 - .3);
   mkRows.forEach((r, k) => tl.fromTo(r, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: .5, ease: 'expo.out', immediateRender: false }, cw('d6', '四百个') + k * .5));
   const amber = new THREE.Color(2.4, 1.5, .4), white = new THREE.Color(1.3, 1.25, 1.2), off = new THREE.Color(.07, .065, .06), neg = new THREE.Color(.35, .5, .75);
+  for (let n = 1; n <= 50; n++) sfx(tSim0 + .6 + (tSim1 - tSim0 - 1.2) * Math.pow(n / 50, 1 / 1.7), 'blip', { f: trials[n - 1].ok ? 880 + n * 6 : 330, g: .22 });
+  sfx(tSim0, 'flash', { g: .5 }); sfx(tSim1, 'paper', { g: .8 }); sfx(cw('d5', '海军'), 'marker'); sfx(tD6, 'flash', { g: .6 }); sfx(tD7 - .3, 'whoosh', { d: 1.2, g: .6 });
   shot({ name: 'ch3', t0: T0, t1: T1, look(t) {
     LOOK.silver(G, F);
     const onSpine = t >= tD7 - .3;
